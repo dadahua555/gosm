@@ -2,11 +2,11 @@ package web
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
+	"gosm/models"
 	"net/http"
 	"strconv"
-
-	"github.com/gorilla/mux"
-	"github.com/martywachocki/gosm/models"
+	"time"
 )
 
 var (
@@ -18,13 +18,19 @@ func Start() {
 	router = mux.NewRouter().StrictSlash(true)
 
 	router.HandleFunc("/services", services)
+	router.HandleFunc("/batchadd", batchadd)
 	router.HandleFunc("/services/{serviceID}", service)
+	router.HandleFunc("/check", check)
+	router.HandleFunc("/smtptest", smtptest)
+	router.HandleFunc("/checklog", checklog)
+	router.HandleFunc("/change", change)
 
 	fs := http.FileServer(http.Dir("./public/"))
 	router.PathPrefix("/").Handler(fs)
 
+	currentTimeData := time.Now().Format("2006-01-02 15:04:05")
 	if models.CurrentConfig.Verbose {
-		fmt.Println("Starting web UI accessible at http://" + models.CurrentConfig.WebUIHost + ":" + strconv.Itoa(models.CurrentConfig.WebUIPort) + "/")
+		fmt.Println(currentTimeData + "  " + "Starting web UI accessible at http://" + models.CurrentConfig.WebUIHost + ":" + strconv.Itoa(models.CurrentConfig.WebUIPort) + "/")
 	}
 	err := http.ListenAndServe(models.CurrentConfig.WebUIHost+":"+strconv.Itoa(models.CurrentConfig.WebUIPort), router)
 	if err != nil {

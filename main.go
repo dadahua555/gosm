@@ -6,9 +6,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/martywachocki/gosm/checker"
-	"github.com/martywachocki/gosm/models"
-	"github.com/martywachocki/gosm/web"
+	"gosm/checker"
+	"gosm/models"
+	"gosm/web"
 )
 
 const (

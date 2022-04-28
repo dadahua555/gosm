@@ -5,7 +5,7 @@ import (
 
 	"github.com/sfreiberg/gotwilio"
 
-	"github.com/martywachocki/gosm/models"
+	"gosm/models"
 )
 
 func sendSMSAlert(service models.Service) {

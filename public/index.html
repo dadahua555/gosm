@@ -7,46 +7,94 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
-    <title>gosm</title>
+    <title>服务探活检测工具</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/jquery.modal.min.css" rel="stylesheet">
     <link href="css/sweetalert.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+<!--    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">  -->
 </head>
-<body>
+<body style="zoom:0.9;">
 
     <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+        <div class="container" style="width:95%;">
             <div class="navbar-header">
-                <a class="navbar-brand" href="/">gosm</a>
+                <a class="navbar-brand" href="/">服务探活检测工具</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
 
             </div>
         </div>
     </nav>
-
-    <div class="container">
-        <div class="row vertical-spacer">
+    <div class="container" style="display:block;width:95%;">
+        <div class="row vertical-spacer" style="display:inline-block;">
             <div class="col-sm-12 text-right">
-                <button class="btn btn-success" id="add-service-button">Add Service</button>
+                <button class="btn btn-success" id="add-service-button">新增服务</button>
             </div>
         </div>
-
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right">
+                <button class="btn btn-success" id="batch-add-button">批量添加</button>
+            </div>
+        </div>
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right">
+                <button class="btn btn-success" id="export-list-button">导出列表</button>
+            </div>
+        </div>
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right">
+                <button class="btn btn-success" id="download-template-button">下载模板</button>
+            </div>
+        </div>
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right">
+                <button class="btn btn-success" id="smtp-test-button">发送测试邮件</button>
+            </div>
+        </div>
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right">
+                <select  class="btn btn-success" style="border:1px;" id="select-group" onchange="ChangeGroup();"></select>
+            </div>
+        </div>
+        <div class="row vertical-spacer" style="display:inline-block;">
+            <div class="col-sm-12 text-right" style="display:inline-block;">
+                  <select  class="btn btn-success" style="border:1px;" id="select-refresh" onchange="ChangeRefresh();">
+                      <option value="5">网页刷新周期：5秒</option>
+                      <option value="10">网页刷新周期：10秒</option>
+                      <option value="30">网页刷新周期：30秒</option>
+                      <option value="60">网页刷新周期：60秒</option>
+                      <option value="120">网页刷新周期：120秒</option>
+                  </select>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="display:block;width:95%;">
         <div class="row">
             <div class="col-sm-12">
-                <table id="services-table" class="table">
+                <table id="services-table" class="table myTable">
                     <thead>
                         <tr>
-                            <th>Service</th>
-                            <th>Protocol</th>
-                            <th>Host</th>
-                            <th>Port</th>
-                            <th>Status</th>
-                            <th>Uptime</th>
-                            <th>Last Offline</th>
-                            <th>Actions</th>
+                            <th class="sort-alpha" style="width:260px;">服务名 
+                            <svg style="vertical-align:middle;" t="1598424636620" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5858" width="16" height="16"><path d="M832 592c0 10.752-3.968 20.096-11.904 28.096l-280 280C532.096 908.096 522.752 912 512 912c-10.816 0-20.16-3.904-28.096-11.904L203.904 620.096C195.904 612.096 192 602.752 192 592s3.904-20.096 11.904-28.096C211.84 555.904 221.184 552 232 552l560 0c10.752 0 20.096 3.904 28.096 11.904C828.032 571.904 832 581.248 832 592zM832 384c0 10.752-3.968 20.096-11.904 28.096-8 8-17.344 11.904-28.096 11.904l-560 0c-10.816 0-20.16-3.904-28.096-11.904C195.904 404.096 192 394.752 192 384s3.904-20.096 11.904-28.096l280-280C491.84 67.968 501.184 64 512 64c10.752 0 20.096 3.968 28.096 11.904l280 280C828.032 363.904 832 373.248 832 384z" p-id="5859" fill="#8a8a8a"></path></svg>
+                            </th>
+                            <th class="sort-alpha">协议 
+                            <svg style="vertical-align:middle;" t="1598424636620" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5858" width="16" height="16"><path d="M832 592c0 10.752-3.968 20.096-11.904 28.096l-280 280C532.096 908.096 522.752 912 512 912c-10.816 0-20.16-3.904-28.096-11.904L203.904 620.096C195.904 612.096 192 602.752 192 592s3.904-20.096 11.904-28.096C211.84 555.904 221.184 552 232 552l560 0c10.752 0 20.096 3.904 28.096 11.904C828.032 571.904 832 581.248 832 592zM832 384c0 10.752-3.968 20.096-11.904 28.096-8 8-17.344 11.904-28.096 11.904l-560 0c-10.816 0-20.16-3.904-28.096-11.904C195.904 404.096 192 394.752 192 384s3.904-20.096 11.904-28.096l280-280C491.84 67.968 501.184 64 512 64c10.752 0 20.096 3.968 28.096 11.904l280 280C828.032 363.904 832 373.248 832 384z" p-id="5859" fill="#8a8a8a"></path></svg>
+                            </th>
+                            <th class="sort-alpha" style="width:260px;">地址
+                            <svg style="vertical-align:middle;" t="1598424636620" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5858" width="16" height="16"><path d="M832 592c0 10.752-3.968 20.096-11.904 28.096l-280 280C532.096 908.096 522.752 912 512 912c-10.816 0-20.16-3.904-28.096-11.904L203.904 620.096C195.904 612.096 192 602.752 192 592s3.904-20.096 11.904-28.096C211.84 555.904 221.184 552 232 552l560 0c10.752 0 20.096 3.904 28.096 11.904C828.032 571.904 832 581.248 832 592zM832 384c0 10.752-3.968 20.096-11.904 28.096-8 8-17.344 11.904-28.096 11.904l-560 0c-10.816 0-20.16-3.904-28.096-11.904C195.904 404.096 192 394.752 192 384s3.904-20.096 11.904-28.096l280-280C491.84 67.968 501.184 64 512 64c10.752 0 20.096 3.968 28.096 11.904l280 280C828.032 363.904 832 373.248 832 384z" p-id="5859" fill="#8a8a8a"></path></svg>
+                            </th>
+                            <th>端口</th>
+                            <th class="sort-alpha">分组 
+                            <svg style="vertical-align:middle;" t="1598424636620" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5858" width="16" height="16"><path d="M832 592c0 10.752-3.968 20.096-11.904 28.096l-280 280C532.096 908.096 522.752 912 512 912c-10.816 0-20.16-3.904-28.096-11.904L203.904 620.096C195.904 612.096 192 602.752 192 592s3.904-20.096 11.904-28.096C211.84 555.904 221.184 552 232 552l560 0c10.752 0 20.096 3.904 28.096 11.904C828.032 571.904 832 581.248 832 592zM832 384c0 10.752-3.968 20.096-11.904 28.096-8 8-17.344 11.904-28.096 11.904l-560 0c-10.816 0-20.16-3.904-28.096-11.904C195.904 404.096 192 394.752 192 384s3.904-20.096 11.904-28.096l280-280C491.84 67.968 501.184 64 512 64c10.752 0 20.096 3.968 28.096 11.904l280 280C828.032 363.904 832 373.248 832 384z" p-id="5859" fill="#8a8a8a"></path></svg>
+                            </th>
+                            <th class="sort-alpha">状态 
+                            <svg style="vertical-align:middle;" t="1598424636620" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5858" width="16" height="16"><path d="M832 592c0 10.752-3.968 20.096-11.904 28.096l-280 280C532.096 908.096 522.752 912 512 912c-10.816 0-20.16-3.904-28.096-11.904L203.904 620.096C195.904 612.096 192 602.752 192 592s3.904-20.096 11.904-28.096C211.84 555.904 221.184 552 232 552l560 0c10.752 0 20.096 3.904 28.096 11.904C828.032 571.904 832 581.248 832 592zM832 384c0 10.752-3.968 20.096-11.904 28.096-8 8-17.344 11.904-28.096 11.904l-560 0c-10.816 0-20.16-3.904-28.096-11.904C195.904 404.096 192 394.752 192 384s3.904-20.096 11.904-28.096l280-280C491.84 67.968 501.184 64 512 64c10.752 0 20.096 3.968 28.096 11.904l280 280C828.032 363.904 832 373.248 832 384z" p-id="5859" fill="#8a8a8a"></path></svg>
+                            </th>
+                            <th>在线时长</th>
+                            <th>离线时间</th>
+                            <th>探测</th>
+                            <th>操作</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -56,14 +104,18 @@
     </div>
 
     <div id="add-service-modal" class="modal" style="display: none;">
-        <h3>Add Service</h3>
+        <h3>新增服务</h3>
         <form id="add-service-form">
             <div class="form-group">
-                <label>Name</label>
-                <input type="text" class="form-control" placeholder="Name" name="name">
+                <br>
+                <label style="color:red;">注意：请勿对mysql数据库进行tcp端口探测</label>
             </div>
             <div class="form-group">
-                <label>Protocol</label>
+                <label>服务名</label>
+                <input type="text" class="form-control" placeholder="服务名" name="name">
+            </div>
+            <div class="form-group">
+                <label>协议</label>
                 <select class="form-control" name="protocol">
                     <option value="http">HTTP</option>
                     <option value="https">HTTPS</option>
@@ -72,30 +124,38 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Host</label>
-                <input type="text" class="form-control" placeholder="Host" name="host">
+                <label>地址</label>
+                <input type="text" class="form-control" placeholder="地址" name="host">
             </div>
             <div class="form-group" style="display: none;">
-                <label>Port</label>
-                <input type="number" class="form-control" placeholder="Port" name="port">
+                <label>端口</label>
+                <input type="number" class="form-control" placeholder="端口" name="port">
+            </div>
+            <div class="form-group">
+                <label>分组</label>
+                <input type="text" class="form-control" placeholder="分组" name="grp">
+            </div>
+            <div class="form-group">
+                <label>邮件通知地址</label>
+                <input type="text" class="form-control" placeholder="aaa@gd.icbc.com.cn;bbb@gd.icbc.com.cn;" name="emails">
             </div>
             <div class="form-group text-right">
-                <button class="btn btn-danger">Cancel</button>
-                <button class="btn btn-success">Add Service</button>
+                <!-- <button class="btn btn-danger">取消</button> -->
+                <button class="btn btn-success">提交</button>
             </div>
         </form>
     </div>
 
     <div id="edit-service-modal" class="modal" style="display: none;">
-        <h3>Edit Service</h3>
+        <h3>编辑服务</h3>
         <form id="edit-service-form">
             <input type="hidden" name="id">
             <div class="form-group">
-                <label>Name</label>
-                <input type="text" class="form-control" placeholder="Name" name="name">
+                <label>名称</label>
+                <input type="text" class="form-control" placeholder="名称" name="name">
             </div>
             <div class="form-group">
-                <label>Protocol</label>
+                <label>协议</label>
                 <select class="form-control" name="protocol">
                     <option value="http">HTTP</option>
                     <option value="https">HTTPS</option>
@@ -104,25 +164,55 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Host</label>
-                <input type="text" class="form-control" placeholder="Host" name="host">
+                <label>地址</label>
+                <input type="text" class="form-control" placeholder="地址" name="host">
             </div>
             <div class="form-group" style="display: none;">
-                <label>Port</label>
-                <input type="number" class="form-control" placeholder="Port" name="port">
+                <label>端口</label>
+                <input type="number" class="form-control" placeholder="端口" name="port">
+            </div>
+            <div class="form-group">
+                <label>分组</label>
+                <input type="text" class="form-control" placeholder="分组" name="grp">
+            </div>
+            <div class="form-group">
+                <label>邮件通知地址</label>
+                <input type="text" class="form-control" placeholder="aaa@gd.icbc.com.cn;bbb@gd.icbc.com.cn;" name="emails">
             </div>
             <div class="form-group text-right">
-                <button class="btn btn-danger">Cancel</button>
-                <button class="btn btn-success">Update Service</button>
+               <!-- <button class="btn btn-danger">取消</button> -->
+                <button class="btn btn-success">提交</button>
             </div>
         </form>
     </div>
 
-    <footer class="footer">
+    <div id="batch-add-modal" class="modal" style="max-width:800px;width:800px;display: none;">
+        <h3>批量添加</h3>
+        <form id="batch-add-form">
+            <div class="form-group">
+                <br>
+                <label style="color:red;">注意：请勿对mysql数据库进行tcp端口探测</label>
+                <br>
+                <label>输入格式：服务名||协议||地址||端口||分组||邮件通知地址</label>
+                <br>
+                <label>对于icmp、http、https协议的服务，端口一列请填写为null</label>
+                <textarea name="services" style="height:300px;width:740px;resize:none;" placeholder="示例: 
+测试icmp服务||icmp||11.22.33.44||null||测试||aaa@gd.icbc.com.cn
+测试http服务||http||http://11.22.33.44:6666/||null||测试||bbb@gd.icbc.com.cn;
+生产https服务||https||http://11.22.33.44:8080/||null||生产||ccc@gd.icbc.com.cn;
+生产tcp服务||tcp||11.22.33.44||8888||生产||aaa@gd.icbc.com.cn;bbb@gd.icbc.com.cn;"></textarea>
+            </div>
+            <div class="form-group text-right">
+                <button class="btn btn-success">提交</button>
+            </div>
+        </form>
+    </div>
+
+<!--    <footer class="footer">
         <div class="container">
             <p class="text-muted"><a href="https://github.com/martywachocki/gosm" target="_blank">gosm</a> by <a href="https://github.com/martywachocki" target="_blank">Marty Wachocki</a></p>
         </div>
-    </footer>
+    </footer> -->
 
     <script src="js/jquery-3.2.0.min.js"></script>
     <script src="js/jquery.modal.min.js"></script>

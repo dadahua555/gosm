@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"net"
 	"net/http"
 	"strconv"
@@ -21,14 +22,60 @@ const (
 
 // Service Represents a service that is being monitored
 type Service struct {
-	ID           int           `db:"id" json:"id"`
-	Name         string        `db:"name" json:"name"`
-	Protocol     string        `db:"protocol" json:"protocol"`
-	Host         string        `db:"host" json:"host"`
-	Port         jsonNullInt64 `db:"port" json:"port"`
-	UptimeStart  int64         `json:"uptime_start"`
-	Status       string        `json:"status"`
-	FailureCount int           `json:"failure_count"`
+	ID            int           `db:"id" json:"id"`
+	Name          string        `db:"name" json:"name"`
+	Protocol      string        `db:"protocol" json:"protocol"`
+	Host          string        `db:"host" json:"host"`
+	Port          jsonNullInt64 `db:"port" json:"port"`
+	Grp           string        `db:"grp" json:"grp"`
+	Emails        string        `db:"emails" json:"emails"`
+	UptimeStart   int64         `json:"uptime_start"`
+	Status        string        `json:"status"`
+	FailureCount  int           `json:"failure_count"`
+	FailtimeStart int64         `json:"failtime_start"`
+	Enabled       int           `json:"enabled"`
+}
+
+func (s *Service) MarshalJSON2() ([]byte, error) {
+	return json.Marshal(&struct {
+		Name     string        `db:"name" json:"name"`
+		Protocol string        `db:"protocol" json:"protocol"`
+		Host     string        `db:"host" json:"host"`
+		Port     jsonNullInt64 `db:"port" json:"port"`
+		Grp      string        `db:"grp" json:"grp"`
+		Emails   string        `db:"emails" json:"emails"`
+		Status   string        `json:"status"`
+		Enabled  int           `db:"enabled" json:"enabled"`
+	}{
+		Name:     s.Name,
+		Protocol: s.Protocol,
+		Host:     s.Host,
+		Port:     s.Port,
+		Grp:      s.Grp,
+		Emails:   s.Emails,
+		Status:   s.Status,
+		Enabled:  s.Enabled,
+	})
+
+}
+
+type CheckLog struct {
+	ID      int    `db:"id" json:"id"`
+	LogTime string `db:"logtime" json:"logtime"`
+	Status  string `db:"status" json:"status"`
+}
+
+func (s *CheckLog) MarshalJSON2() ([]byte, error) {
+	return json.Marshal(&struct {
+		ID      int    `db:"id" json:"id"`
+		LogTime string `db:"logtime" json:"logtime"`
+		Status  string `db:"status" json:"status"`
+	}{
+		ID:      s.ID,
+		LogTime: s.LogTime,
+		Status:  s.Status,
+	})
+
 }
 
 var (
@@ -101,16 +148,18 @@ func checkTCP(host string, port int64) bool {
 // LoadServices Loads all the services into CurrentServices and sets defaults
 func LoadServices() {
 	var services []Service
-	Database.Select(&services, "SELECT * FROM services")
+	Database.Select(&services, "SELECT * FROM services order by grp,protocol,name")
 
 	for i := range services {
 		services[i].Status = Online
 		services[i].UptimeStart = time.Now().Unix()
+		services[i].FailtimeStart = time.Now().Unix()
 		for j := range CurrentServices {
 			if CurrentServices[j].ID == services[i].ID {
-				services[i].Status = CurrentServices[i].Status
-				services[i].UptimeStart = CurrentServices[i].UptimeStart
-				services[i].FailureCount = CurrentServices[i].FailureCount
+				services[i].Status = CurrentServices[j].Status
+				services[i].UptimeStart = CurrentServices[j].UptimeStart
+				services[i].FailureCount = CurrentServices[j].FailureCount
+				services[i].FailtimeStart = CurrentServices[j].FailtimeStart
 				break
 			}
 		}

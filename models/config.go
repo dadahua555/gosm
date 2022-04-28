@@ -25,11 +25,14 @@ type Config struct {
 	SMTPEmailAddress            string   `json:"smtp_email_address"`
 	SMTPUsername                string   `json:"smtp_username"`
 	SMTPPassword                string   `json:"smtp_password"`
+	SMTPAuth                    bool     `json:"smtp_auth"`
 	SendSMS                     bool     `json:"send_sms"`
 	SMSRecipients               []string `json:"sms_recipients"`
 	TwilioAccountSID            string   `json:"twilio_account_sid"`
 	TwilioAuthToken             string   `json:"twilio_auth_token"`
 	TwilioPhoneNumber           string   `json:"twilio_phone_number"`
+	ConfigPassword              string   `json:"config_password"`
+	ArchiveDay                  int      `json:"archive_day"`
 }
 
 var (

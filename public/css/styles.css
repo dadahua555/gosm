@@ -43,3 +43,22 @@ body {
     margin: 15px 0;
     font-size: 12px;
 }
+
+tr.odd{background-color:#ddd;}
+tr.even{background-color:#eee;}
+.clickable{}
+.hover{background-color: #5dd354;}
+.sorted{background-color: #ded070;}
+.page-number{
+  color:Black;
+  margin:2px 10px;
+  padding:2px 5px;
+}
+.active{
+  border:solid 1px red;
+  background-color:#76a7d2;
+}
+.pager{
+  margin-bottom:10px;
+  margin-left:20px;
+}
