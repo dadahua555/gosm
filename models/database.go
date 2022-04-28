@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"io/ioutil"
@@ -32,6 +33,7 @@ func Connect() {
 	}
 	database, err := sqlx.Open("sqlite3", databasePath)
 	if err != nil {
+		fmt.Println("打开数据库失败")
 		panic(err)
 	}
 	Database = database
