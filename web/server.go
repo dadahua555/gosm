@@ -27,7 +27,7 @@ func Start() {
 	router.HandleFunc("/checklog", checklog)
 	router.HandleFunc("/change", change)
 	router.HandleFunc("/userLogin", login)
-	//router.HandleFunc("/ValidateLogin", validate)
+	router.HandleFunc("/ValidateLogin", validate)
 
 	fs := http.FileServer(http.Dir("./public/"))
 	router.PathPrefix("/").Handler(fs)

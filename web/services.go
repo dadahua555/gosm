@@ -14,7 +14,7 @@ import (
 )
 
 func services(writer http.ResponseWriter, request *http.Request) {
-	fmt.Println("wocao")
+
 	var payload []byte
 
 	switch request.Method {
@@ -201,7 +201,7 @@ func change(writer http.ResponseWriter, request *http.Request) {
 	writer.Write(payload)
 }
 
-//新加代码,验证
+//新加代码,验证中间件
 func userAuth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//userName := strings.Trim(r.)
@@ -216,8 +216,7 @@ func userAuth(next http.Handler) http.Handler {
 		var payload []byte
 
 		token := r.Header.Get("Auth-token")
-		fmt.Println(r.RequestURI)
-		fmt.Println("sdfd" + token)
+
 		err := models.RestoreToken(token)
 		if err != nil {
 			payload, _ = json.Marshal(map[string]interface{}{
@@ -227,7 +226,6 @@ func userAuth(next http.Handler) http.Handler {
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(payload)
 		} else {
-			fmt.Println("dddd")
 			next.ServeHTTP(w, r)
 		}
 	})
@@ -235,13 +233,12 @@ func userAuth(next http.Handler) http.Handler {
 
 //新加代码,登录
 func login(writer http.ResponseWriter, request *http.Request) {
-	fmt.Println("dasdfa")
 	query := request.URL.Query()
 
 	var payload []byte
 	loginUser := query.Get("user")
 	loginPassword := query.Get("password")
-	fmt.Println(loginUser + loginPassword)
+	//fmt.Println(loginUser + loginPassword)
 
 	if loginUser != models.CurrentConfig.UserName || loginPassword != models.CurrentConfig.UserPassword {
 		payload, _ = json.Marshal(map[string]interface{}{
@@ -282,6 +279,29 @@ func createUser(writer http.ResponseWriter, request *http.Request) {
 		models.Database.MustExec("INSERT into admin values ('" + loginUser + "', '" + loginPassword + "')")
 		payload = []byte("{\"success\":true}")
 	}
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write(payload)
+}
+
+//新加代码,验证
+func validate(writer http.ResponseWriter, request *http.Request) {
+	var payload []byte
+
+	token := request.Header.Get("Auth-token")
+
+	err := models.RestoreToken(token)
+	if err != nil {
+		payload, _ = json.Marshal(map[string]interface{}{
+			"success": false,
+			"auth":    false,
+		})
+	} else {
+		payload, _ = json.Marshal(map[string]interface{}{
+			"success": true,
+			"auth":    true,
+		})
+	}
+
 	writer.Header().Set("Content-Type", "application/json")
 	writer.Write(payload)
 }

@@ -1,5 +1,15 @@
 $(function() {
-    loginDisplay()
+    display()
+
+    function display(){
+        var status = sessionStorage.getItem("status")
+        if (status === "true") {
+            pageDisplay()
+        } else {
+            loginDisplay()
+        }
+    }
+
     function loginDisplay() {
         $(".container").css("display","none")
         $(".login").css("display","block")
@@ -11,7 +21,12 @@ $(function() {
 
     //save token
     function  save_token(token){
-        sessionStorage.setItem("token",token); //存储数据
+        sessionStorage.setItem("token",token); //存储token
+    }
+
+    //save status
+    function save_status(status){
+        sessionStorage.setItem("status", status); //存储登录状态
     }
 
     //add botten fution
@@ -29,14 +44,18 @@ $(function() {
                         type: 'success'
                     });
                     save_token(result.token)
-                    pageDisplay()
+                    save_status("true")
+                    //pageDisplay()
+                    display()
                 } else {
                     swal({
                         title: 'Failure',
                         text: '登录失败',
                         type: 'error'
                     });
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                 }
             }
         });
@@ -397,7 +416,9 @@ $(function() {
                       }
                       if (result.auth === false) {
                           swal( '未登录或者token过期' + '失败', 'error');
-                          loginDisplay()
+                          //loginDisplay()
+                          save_status("false")
+                          display()
                       }
 	          }
 	      });
@@ -415,7 +436,9 @@ $(function() {
                 if (service.auth === false) {
                     console.log(service)
                     swal( '未登录或者token过期' + '失败', 'error');
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                     return
                 }
 
@@ -457,7 +480,9 @@ $(function() {
             success: function(result) {
                 if (result.auth === false) {
                     swal( '未登录或者token过期' + '失败', 'error');
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                     return
                 }
                 if( result.success == true ) {
@@ -527,7 +552,9 @@ $(function() {
                 success: function(result) {
                     if (result.auth === false) {
                         swal( '未登录或者token过期' + '失败', 'error');
-                        loginDisplay()
+                        //loginDisplay()
+                        save_status("false")
+                        display()
                         return
                     }
                     if( result.success == true ) {
@@ -567,7 +594,9 @@ $(function() {
             success: function(result) {
                 if (result.auth === false) {
                     swal( '未登录或者token过期' + '失败', 'error');
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                     return
                 }
                 swal({
@@ -609,7 +638,9 @@ $(function() {
                 success: function(resutl) {
                     if (resutl.auth === false) {
                         swal( '未登录或者token过期' + '失败', 'error');
-                        loginDisplay()
+                        //loginDisplay()
+                        save_status("false")
+                        display()
                         return
                     }
                     swal({
@@ -630,7 +661,9 @@ $(function() {
             success: function(result) {
                 if (result.auth === false) {
                     swal( '未登录或者token过期' + '失败', 'error');
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                     return
                 }
                 swal({
@@ -654,11 +687,19 @@ $(function() {
 
     //导出节点列表
     $(document).on("click", "#export-list-button", function () {
-        if (sessionStorage.getItem("token") === ""){
-            swal( '未登录或者token过期' + '失败', 'error');
-            loginDisplay()
-            return
-        }
+        $.ajax({
+            url: '/ValidateLogin',
+            method: 'GET',
+            success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    //loginDisplay()
+                    save_status("false")
+                    display()
+                    return
+                }
+            }
+        });
         $.get('/services', function(services) {
             if (!services) {
                 return;
@@ -684,11 +725,20 @@ $(function() {
 
     //下载批量添加模板
     $(document).on("click", "#download-template-button", function () {
-        if (sessionStorage.getItem("token") === ""){
-            swal( '未登录或者token过期' + '失败', 'error');
-            loginDisplay()
-            return
-        }
+        $.ajax({
+            url: '/ValidateLogin',
+            method: 'GET',
+            success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    //loginDisplay()
+                    save_status("false")
+                    display()
+                    return
+                }
+            }
+        });
+
         var link = document.createElement("a");
         link.setAttribute("href", "template.xls");
         link.setAttribute("download",  "template.xls");
@@ -703,7 +753,9 @@ $(function() {
             success: function(result) {
                 if (result.auth === false) {
                     swal( '未登录或者token过期' + '失败', 'error');
-                    loginDisplay()
+                    //loginDisplay()
+                    save_status("false")
+                    display()
                     return
                 }
                 swal({

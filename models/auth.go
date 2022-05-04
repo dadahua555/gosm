@@ -11,7 +11,7 @@ import (
 
 //该文件是我新加的
 
-const tokenDuration = 10 * time.Hour
+const tokenDuration = 2 * time.Hour
 
 var (
 	RandomString string
@@ -49,7 +49,7 @@ func GenerateToken(name string) (string, error) {
 	claims["iat"] = time.Now().Unix()
 	claims["username"] = name
 	token.Claims = claims
-	fmt.Println(RandomString)
+	//fmt.Println(RandomString)
 
 	return token.SignedString([]byte(RandomString))
 }
@@ -68,11 +68,11 @@ func RestoreToken(authToken string) error {
 		return err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
+	_, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		return errors.New("invalid claims")
 	}
-	fmt.Println(claims["username"])
+	//fmt.Println(claims["username"])
 
 	return nil
 }
