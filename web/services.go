@@ -9,10 +9,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
 func services(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("wocao")
 	var payload []byte
 
 	switch request.Method {
@@ -193,6 +195,91 @@ func change(writer http.ResponseWriter, request *http.Request) {
 				}
 			}
 		}
+		payload = []byte("{\"success\":true}")
+	}
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write(payload)
+}
+
+//新加代码,验证
+func userAuth(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//userName := strings.Trim(r.)
+		//如果是用户登录，跳过验证
+		url := r.RequestURI
+		i := strings.Index(url, "userLogin")
+		if i != -1 {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		var payload []byte
+
+		token := r.Header.Get("Auth-token")
+		fmt.Println(r.RequestURI)
+		fmt.Println("sdfd" + token)
+		err := models.RestoreToken(token)
+		if err != nil {
+			payload, _ = json.Marshal(map[string]interface{}{
+				"success": false,
+				"auth":    false,
+			})
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(payload)
+		} else {
+			fmt.Println("dddd")
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+
+//新加代码,登录
+func login(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println("dasdfa")
+	query := request.URL.Query()
+
+	var payload []byte
+	loginUser := query.Get("user")
+	loginPassword := query.Get("password")
+	fmt.Println(loginUser + loginPassword)
+
+	if loginUser != models.CurrentConfig.UserName || loginPassword != models.CurrentConfig.UserPassword {
+		payload, _ = json.Marshal(map[string]interface{}{
+			"success": false,
+			"token":   "",
+		})
+	} else {
+		token, err := models.GenerateToken(loginUser)
+		if err != nil {
+			fmt.Printf("生成jwt失败: %s\n", err)
+			payload = []byte("{\"success\":false}")
+		}
+
+		payload, _ = json.Marshal(map[string]interface{}{
+			"success": true,
+			"token":   token,
+		})
+	}
+	writer.Header().Set("Content-Type", "application/json")
+	writer.Write(payload)
+}
+
+//新加代码，创建用户
+func createUser(writer http.ResponseWriter, request *http.Request) {
+	query := request.URL.Query()
+
+	var payload []byte
+	loginUser := query.Get("user")
+	loginPassword := query.Get("password")
+
+	result, _ := models.Database.MustExec("SELECT count(*) from admin").RowsAffected()
+
+	if loginUser == "" || loginPassword == "" {
+		payload = []byte("{\"success\":false}")
+	} else if result != 0 {
+		payload = []byte("{\"success\":false}")
+	} else {
+		models.Database.MustExec("INSERT into admin values ('" + loginUser + "', '" + loginPassword + "')")
 		payload = []byte("{\"success\":true}")
 	}
 	writer.Header().Set("Content-Type", "application/json")

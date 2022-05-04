@@ -17,3 +17,8 @@ CREATE TABLE checklog(
 );
 
 create index checklogindex on checklog(id,logtime);
+
+CREATE TABLE admin(
+                         user TEXT NOT NULL,
+                         password TEXT NOT NULL
+);

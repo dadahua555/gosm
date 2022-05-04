@@ -27,6 +27,7 @@ func main() {
 	}
 	fixSIGTERM()
 	models.CurrentConfig = models.ParseConfigFile()
+	models.RandomString = models.RandAuthToken()
 	models.Connect()
 	models.LoadServices()
 	go web.Start()

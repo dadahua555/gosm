@@ -17,6 +17,8 @@ var (
 func Start() {
 	router = mux.NewRouter().StrictSlash(true)
 
+	router.Use(userAuth)
+
 	router.HandleFunc("/services", services)
 	router.HandleFunc("/batchadd", batchadd)
 	router.HandleFunc("/services/{serviceID}", service)
@@ -24,6 +26,8 @@ func Start() {
 	router.HandleFunc("/smtptest", smtptest)
 	router.HandleFunc("/checklog", checklog)
 	router.HandleFunc("/change", change)
+	router.HandleFunc("/userLogin", login)
+	//router.HandleFunc("/ValidateLogin", validate)
 
 	fs := http.FileServer(http.Dir("./public/"))
 	router.PathPrefix("/").Handler(fs)

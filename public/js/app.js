@@ -1,4 +1,56 @@
 $(function() {
+    loginDisplay()
+    function loginDisplay() {
+        $(".container").css("display","none")
+        $(".login").css("display","block")
+    }
+    function pageDisplay() {
+        $(".container").css("display","block")
+        $(".login").css("display","none")
+    }
+
+    //save token
+    function  save_token(token){
+        sessionStorage.setItem("token",token); //存储数据
+    }
+
+    //add botten fution
+    $("#login-button").click(function () {
+        var userName = $("#username").val();
+        var pwd = $("#pwd").val();
+        $.ajax({
+            url: '/userLogin/?user=' + userName + '&password=' + pwd,
+            method: 'POST',
+            success: function(result) {
+                if (result.success === true) {
+                    swal({
+                        title: 'Success',
+                        text: '登录成功',
+                        type: 'success'
+                    });
+                    save_token(result.token)
+                    pageDisplay()
+                } else {
+                    swal({
+                        title: 'Failure',
+                        text: '登录失败',
+                        type: 'error'
+                    });
+                    loginDisplay()
+                }
+            }
+        });
+    });
+
+    //set token
+    $.ajaxSetup({
+        contentType: "application/x-www-form-urlencoded",
+        beforeSend: function(xhr) {
+            // 利用请求头携带token数据
+            xhr.setRequestHeader('Auth-Token', sessionStorage.getItem('token'))
+        }
+    })
+
     function updateTable(services) {
         if (!services) {
             return;
@@ -174,8 +226,50 @@ $(function() {
     
     function getServices() {
         $.get('/services', function(services) {
-            updateTable(services);
+            if (services.auth === false) {
+                //swal( '未登录或者token过期' + '失败', 'error');
+                loginDisplay()
+                return
+            }
+            updateTable(services)
         });
+        /*
+        $.ajax({
+            url: '/services/' + id,
+            method: 'GET',
+            success: function(service) {
+                if (service.auth === false) {
+                    console.log(service)
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    save_token("")
+                    return
+                }
+
+                var port = $('#edit-service-modal').find('input[name=port]').closest('.form-group');
+                if (service.protocol != 'http' && service.protocol != 'https' && service.protocol != 'icmp') {
+                    port.show();
+                } else {
+                    port.hide();
+                }
+
+                $('#edit-service-modal input[name=id]').val(service.id);
+                $('#edit-service-modal input[name=name]').val(service.name);
+                $('#edit-service-modal select[name=protocol]').val(service.protocol);
+                $('#edit-service-modal input[name=host]').val(service.host);
+                $('#edit-service-modal input[name=port]').val(service.port);
+                $('#edit-service-modal input[name=grp]').val(service.grp);
+                $('#edit-service-modal input[name=emails]').val(service.emails);
+                $('#edit-service-modal').modal();
+            },
+            error: function (result) {
+                console.log(result)
+                swal( '未登录或者token过期' + '失败', 'error');
+                loginDisplay()
+                save_token("")
+            }
+        });
+        */
     }
 
     function getStatusTextClass(status) {
@@ -253,6 +347,7 @@ $(function() {
         }
     });
 
+
     function addService(servicestr) {
         if( servicestr==null || servicestr == "" ){
             return 1;
@@ -299,7 +394,11 @@ $(function() {
 	                  //    type: 'success'
 	                  //});
                           return 0;
-                      } 
+                      }
+                      if (result.auth === false) {
+                          swal( '未登录或者token过期' + '失败', 'error');
+                          loginDisplay()
+                      }
 	          }
 	      });
         } else {
@@ -313,6 +412,13 @@ $(function() {
             url: '/services/' + id,
             method: 'GET',
             success: function(service) {
+                if (service.auth === false) {
+                    console.log(service)
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    return
+                }
+
                 var port = $('#edit-service-modal').find('input[name=port]').closest('.form-group');
                 if (service.protocol != 'http' && service.protocol != 'https' && service.protocol != 'icmp') {
                     port.show();
@@ -328,6 +434,11 @@ $(function() {
                 $('#edit-service-modal input[name=grp]').val(service.grp);
                 $('#edit-service-modal input[name=emails]').val(service.emails);
                 $('#edit-service-modal').modal();
+            },
+            error: function (result) {
+                console.log(result)
+                swal( '未登录或者token过期' + '失败', 'error');
+                loginDisplay()
             }
         });
     });
@@ -344,6 +455,11 @@ $(function() {
             url: '/change?serviceID=' + id + '&enabled=' + newenabled,
             method: 'GET',
             success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    return
+                }
                 if( result.success == true ) {
                     swal( tip + '成功', 'success');
                     getServices();
@@ -409,6 +525,11 @@ $(function() {
                 url: '/services/' + id + '?input_password=' + inputValue,
                 method: 'DELETE',
                 success: function(result) {
+                    if (result.auth === false) {
+                        swal( '未登录或者token过期' + '失败', 'error');
+                        loginDisplay()
+                        return
+                    }
                     if( result.success == true ) {
                         $('#services-table tr[data-id=1]').remove()
                         swal('Deleted', '服务 "' + serviceName + '" 已被删除', 'success');
@@ -443,7 +564,12 @@ $(function() {
             url: '/services',
             method: 'POST',
             data: service,
-            success: function() {
+            success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    return
+                }
                 swal({
                     title: 'Success',
                     text: '服务 "' + name + '" 添加成功',
@@ -480,7 +606,12 @@ $(function() {
                 url: '/services/' + id,
                 method: 'PUT',
                 data: service,
-                success: function() {
+                success: function(resutl) {
+                    if (resutl.auth === false) {
+                        swal( '未登录或者token过期' + '失败', 'error');
+                        loginDisplay()
+                        return
+                    }
                     swal({
                         title: 'Success',
                         text: '服务 "' + name + '" 修改成功',
@@ -496,7 +627,12 @@ $(function() {
             url: '/services/' + id,
             method: 'PUT',
             data: service,
-            success: function() {
+            success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    return
+                }
                 swal({
                     title: 'Success',
                     text: '服务 "' + name + '" 修改成功',
@@ -516,7 +652,105 @@ $(function() {
     getServices();
     setInterval(getServices, refreshsec*1000);
 
+    //导出节点列表
+    $(document).on("click", "#export-list-button", function () {
+        if (sessionStorage.getItem("token") === ""){
+            swal( '未登录或者token过期' + '失败', 'error');
+            loginDisplay()
+            return
+        }
+        $.get('/services', function(services) {
+            if (!services) {
+                return;
+            }
+            var str = "服务名,协议,地址,端口,分组,通知邮件地址,状态,拼接字符串\r\n";
+            for (var i in services) {
+                var service = services[i];
+                constr = service.name + "||"+service.protocol+"||"+service.host+"||"+(service.port ? service.port : 'null')+"||"+service.grp+"||"+service.emails
+                str += service.name + ',' + service.protocol + ',' + service.host + ',' + (service.port ? service.port : 'null') + ',' + service.grp + ',' + service.emails + ',' + service.status + ',' + constr + "\r\n";
+            }
+            //var jscsv = "data:text/csv;charset=utf-8,\ufeff" + str.replace(/#/g,'"#"');
+            var urlObject = window.URL || window.webkitURL || window;
+            var link = document.createElement("a");
+            var timestr = getTimestr();
+            var export_blob = new Blob([str]);
+            link.href = urlObject.createObjectURL(export_blob);
+            link.download = "服务列表"+timestr+".txt";
+            //link.setAttribute("href", jscsv);
+            //link.setAttribute("download", "服务列表"+timestr+".csv");
+            link.click();
+        });
+    });
+
+    //下载批量添加模板
+    $(document).on("click", "#download-template-button", function () {
+        if (sessionStorage.getItem("token") === ""){
+            swal( '未登录或者token过期' + '失败', 'error');
+            loginDisplay()
+            return
+        }
+        var link = document.createElement("a");
+        link.setAttribute("href", "template.xls");
+        link.setAttribute("download",  "template.xls");
+        link.click();
+    });
+
+    //发送SMTP测试邮件
+    $(document).on("click", "#smtp-test-button", function () {
+        $.ajax({
+            url: '/smtptest',
+            method: 'POST',
+            success: function(result) {
+                if (result.auth === false) {
+                    swal( '未登录或者token过期' + '失败', 'error');
+                    loginDisplay()
+                    return
+                }
+                swal({
+                    title: 'Success',
+                    text: '已提交发送SMTP测试邮件',
+                    type: 'success'
+                });
+            }
+        });
+    });
+
+    function change(t) {
+        if (t < 10) {
+            return "0" + t;
+        } else {
+            return t;
+        }
+    }
+
+
+    function getTimestr() {
+        var d = new Date();
+        var year = d.getFullYear();
+        var month = change(d.getMonth() + 1);
+        var day = change(d.getDate());
+        var hour = change(d.getHours());
+        var minute = change(d.getMinutes());
+
+        var time = year + month + day + hour + minute;
+        return time;
+    }
+
+    function formatDatestr(datestr) {
+        var d = new Date(datestr);
+        var year = d.getFullYear();
+        var month = change(d.getMonth() + 1);
+        var day = change(d.getDate());
+        var hour = change(d.getHours());
+        var minute = change(d.getMinutes());
+
+        var time = year + "-" + month + "-" + day + " " + hour + ":" + minute;
+        return time;
+    }
+
 });
+
+/*
 
     //导出节点列表
     $(document).on("click", "#export-list-button", function () {
@@ -535,7 +769,7 @@ $(function() {
             var link = document.createElement("a");
             var timestr = getTimestr();
             var export_blob = new Blob([str]);
-            link.href = urlObject.createObjectURL(export_blob);          
+            link.href = urlObject.createObjectURL(export_blob);
             link.download = "服务列表"+timestr+".txt";
             //link.setAttribute("href", jscsv);
             //link.setAttribute("download", "服务列表"+timestr+".csv");
@@ -565,6 +799,7 @@ $(function() {
             }
         });
     });
+
 
     function ChangeGroup(){
         var group=$("#select-group").val();
@@ -614,3 +849,17 @@ $(function() {
       return time;
     }
 
+*/
+
+function ChangeGroup(){
+    var group=$("#select-group").val();
+    sessionStorage.setItem("group",group);
+    window.location.reload();
+}
+
+
+function ChangeRefresh(){
+    var refreshsec=$("#select-refresh").val();
+    sessionStorage.setItem("refreshsec",refreshsec);
+    window.location.reload();
+}
