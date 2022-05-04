@@ -1,9 +1,12 @@
 package web
 
 import (
+	"crypto/rand"
+	"crypto/tls"
 	"fmt"
 	"github.com/gorilla/mux"
 	"gosm/models"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -12,6 +15,19 @@ import (
 var (
 	router *mux.Router
 )
+
+//cert.pem, key.unencrypted.pem
+func inittls(cfg *tls.Config) {
+	crt, err := tls.LoadX509KeyPair("./private/serverCert.pem", "./private/server-key.pem")
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	cfg.Time = time.Now
+	cfg.Rand = rand.Reader
+	cfg.Certificates = []tls.Certificate{crt}
+
+}
 
 // Start Starts the webserver
 func Start() {
@@ -34,10 +50,29 @@ func Start() {
 
 	currentTimeData := time.Now().Format("2006-01-02 15:04:05")
 	if models.CurrentConfig.Verbose {
-		fmt.Println(currentTimeData + "  " + "Starting web UI accessible at http://" + models.CurrentConfig.WebUIHost + ":" + strconv.Itoa(models.CurrentConfig.WebUIPort) + "/")
+		fmt.Println(currentTimeData + "  " + "Starting web UI accessible at https://" + models.CurrentConfig.WebUIHost + ":" + strconv.Itoa(models.CurrentConfig.WebUIPort) + "/")
 	}
-	err := http.ListenAndServe(models.CurrentConfig.WebUIHost+":"+strconv.Itoa(models.CurrentConfig.WebUIPort), router)
+
+	sslconfig := &tls.Config{}
+	inittls(sslconfig)
+
+	srv := &http.Server{
+		Addr:         "127.0.0.1:7301",
+		Handler:      router,
+		TLSConfig:    sslconfig,
+		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
+	}
+
+	err := srv.ListenAndServeTLS("./private/serverCert.pem", "./private/server-key.pem")
 	if err != nil {
 		panic(err)
 	}
+
+	/*
+		err := http.ListenAndServe(models.CurrentConfig.WebUIHost+":"+strconv.Itoa(models.CurrentConfig.WebUIPort), router)
+		if err != nil {
+			panic(err)
+		}
+
+	*/
 }
