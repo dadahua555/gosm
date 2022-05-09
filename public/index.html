@@ -13,6 +13,17 @@
     <link href="css/sweetalert.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 <!--    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">  -->
+    <style>
+        #login-div {
+            position:fixed;
+            top: 50%;
+            left: 50%;
+            width:30em;
+            height:18em;
+            margin-top: -9em; /*set to a negative number 1/2 of your height*/
+            margin-left: -15em; /*set to a negative number 1/2 of your width*/
+        }
+    </style>
 </head>
 <body style="zoom:0.9;">
 
@@ -69,11 +80,11 @@
             </div>
         </div>
     </div>
-    <div class="login">
+    <div class="login" id="login-div" >
         <div style="display:inline-block; " >
-            <p>账号</p>
+            <p style="border:1px;">账号 </p>
             <input type="text" id="username" style="border:1px; background-color:mediumseagreen;">
-            <p>密码</p>
+            <p style="border:1px;">密码 </p>
             <input type="password" id="pwd"  style="border:1px; background-color:mediumseagreen;">
             <button id="login-button" style="border:1px;">登录</button>
         </div>

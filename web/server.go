@@ -18,7 +18,7 @@ var (
 
 //cert.pem, key.unencrypted.pem
 func inittls(cfg *tls.Config) {
-	crt, err := tls.LoadX509KeyPair("./private/serverCert.pem", "./private/server-key.pem")
+	crt, err := tls.LoadX509KeyPair("./private/https.crt", "./private/https.key")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -57,13 +57,13 @@ func Start() {
 	inittls(sslconfig)
 
 	srv := &http.Server{
-		Addr:         "127.0.0.1:7301",
+		Addr:         models.CurrentConfig.WebUIHost + ":" + strconv.Itoa(models.CurrentConfig.WebUIPort),
 		Handler:      router,
 		TLSConfig:    sslconfig,
 		TLSNextProto: make(map[string]func(*http.Server, *tls.Conn, http.Handler), 0),
 	}
 
-	err := srv.ListenAndServeTLS("./private/serverCert.pem", "./private/server-key.pem")
+	err := srv.ListenAndServeTLS("./private/https.crt", "./private/https.key")
 	if err != nil {
 		panic(err)
 	}

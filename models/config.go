@@ -33,7 +33,7 @@ type Config struct {
 	TwilioPhoneNumber           string   `json:"twilio_phone_number"`
 	ConfigPassword              string   `json:"config_password"`
 	ArchiveDay                  int      `json:"archive_day"`
-	UserName                    string   `json:"user_Name"`
+	UserName                    string   `json:"user_name"`
 	UserPassword                string   `json:"user_password"`
 }
 

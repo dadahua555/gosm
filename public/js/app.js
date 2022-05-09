@@ -29,6 +29,7 @@ $(function() {
         sessionStorage.setItem("status", status); //存储登录状态
     }
 
+
     //add botten fution
     $("#login-button").click(function () {
         var userName = $("#username").val();
